@@ -21,8 +21,9 @@ Static assets served from root:
 ## Key Conventions
 
 ### File Naming
-- React components: PascalCase (e.g., `RootLayout`)
-- Files: kebab-case or camelCase
+- **ディレクトリ名**: 機能や役割が明確に分かる命名を使用（例: `NewFeatureListItemPage`, `Header`）
+- **ファイル名**: ケバブケースを使用し、処理や役割が分かる命名にする（例: `button.tsx`, `use-theme-color.ts`）
+- **コンポーネント名**: パスカルケースを使用（例: `HeaderBreadcrumb`, `NewFeatureDropdown`）
 - TypeScript: `.tsx` for components, `.ts` for utilities
 
 ### Component Structure
