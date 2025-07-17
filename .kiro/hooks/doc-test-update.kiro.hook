@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Documentation & Test Update",
+  "description": "Automatically updates documentation and runs unit tests when source files are changed",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "app/**/*.tsx",
+      "app/**/*.ts",
+      "*.ts",
+      "*.tsx",
+      "package.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file has been modified in this Next.js project. Please:\n1. Review the changes and determine if documentation (README.md or other docs) needs to be updated\n2. If documentation updates are needed, update the relevant documentation files\n3. Run or suggest appropriate unit tests to ensure the changes work correctly\n4. Provide a summary of what was updated and any test results\n\nFocus on maintaining code quality and keeping documentation in sync with the codebase."
+  }
+}
