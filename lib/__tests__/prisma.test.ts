@@ -14,8 +14,8 @@ describe('Prisma Client', () => {
     expect(typeof prisma.todo.delete).toBe('function')
   })
 
-  it('should be a singleton instance', () => {
-    const { prisma: prisma2 } = require('../prisma')
+  it('should be a singleton instance', async () => {
+    const { prisma: prisma2 } = await import('../prisma')
     expect(prisma).toBe(prisma2)
   })
 })

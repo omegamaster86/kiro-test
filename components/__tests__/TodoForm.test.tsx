@@ -84,7 +84,6 @@ describe('TodoForm', () => {
   it('空のタイトルでは送信できない', () => {
     render(<TodoForm />)
     
-    const input = screen.getByPlaceholderText('新しいタスクを入力...')
     const button = screen.getByRole('button', { name: '追加' })
     
     // 空の状態で送信を試行

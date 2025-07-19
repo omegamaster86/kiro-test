@@ -1,46 +1,101 @@
 import { render, screen } from '@testing-library/react'
-import Home from '../page'
+import TodoPage from '../page'
+import { getTodos } from '@/lib/actions'
 
-describe('Home Page', () => {
-  it('renders the Next.js logo', () => {
-    render(<Home />)
-    
-    const logo = screen.getByAltText('Next.js logo')
-    expect(logo).toBeInTheDocument()
+// Server Actionsとコンポーネントをモック化
+jest.mock('@/lib/actions', () => ({
+  getTodos: jest.fn()
+}))
+
+jest.mock('@/components/TodoForm', () => {
+  return function MockTodoForm() {
+    return <div data-testid="todo-form">Todo Form</div>
+  }
+})
+
+jest.mock('@/components/TodoFilter', () => {
+  return function MockTodoFilter() {
+    return <div data-testid="todo-filter">Todo Filter</div>
+  }
+})
+
+interface Todo {
+  id: string
+  title: string
+  completed: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+jest.mock('@/components/TodoList', () => {
+  return function MockTodoList({ todos }: { todos: Todo[] }) {
+    return <div data-testid="todo-list">Todo List ({todos.length} items)</div>
+  }
+})
+
+const mockGetTodos = getTodos as jest.MockedFunction<typeof getTodos>
+
+describe('TodoPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
 
-  it('renders the welcome text', () => {
-    render(<Home />)
+  it('renders the page title and description', async () => {
+    mockGetTodos.mockResolvedValue([])
     
-    const welcomeText = screen.getByText(/Get started by editing/i)
-    expect(welcomeText).toBeInTheDocument()
+    render(await TodoPage({ searchParams: Promise.resolve({}) }))
+    
+    expect(screen.getByText('ToDoリスト')).toBeInTheDocument()
+    expect(screen.getByText('タスクを管理して効率的に作業を進めましょう')).toBeInTheDocument()
   })
 
-  it('renders the deploy button', () => {
-    render(<Home />)
+  it('renders all main components', async () => {
+    mockGetTodos.mockResolvedValue([])
     
-    const deployButton = screen.getByRole('link', { name: /deploy now/i })
-    expect(deployButton).toBeInTheDocument()
-    expect(deployButton).toHaveAttribute('href', expect.stringContaining('vercel.com'))
+    render(await TodoPage({ searchParams: Promise.resolve({}) }))
+    
+    expect(screen.getByTestId('todo-form')).toBeInTheDocument()
+    expect(screen.getByTestId('todo-filter')).toBeInTheDocument()
+    expect(screen.getByTestId('todo-list')).toBeInTheDocument()
   })
 
-  it('renders the docs link', () => {
-    render(<Home />)
+  it('calls getTodos with default filter "all"', async () => {
+    mockGetTodos.mockResolvedValue([])
     
-    const docsLink = screen.getByRole('link', { name: /read our docs/i })
-    expect(docsLink).toBeInTheDocument()
-    expect(docsLink).toHaveAttribute('href', expect.stringContaining('nextjs.org/docs'))
+    render(await TodoPage({ searchParams: Promise.resolve({}) }))
+    
+    expect(mockGetTodos).toHaveBeenCalledWith('all')
   })
 
-  it('renders footer navigation links', () => {
-    render(<Home />)
+  it('calls getTodos with specified filter', async () => {
+    mockGetTodos.mockResolvedValue([])
     
-    const learnLink = screen.getByRole('link', { name: /learn/i })
-    const examplesLink = screen.getByRole('link', { name: /examples/i })
-    const nextjsLink = screen.getByRole('link', { name: /go to nextjs.org/i })
+    render(await TodoPage({ searchParams: Promise.resolve({ filter: 'active' }) }))
     
-    expect(learnLink).toBeInTheDocument()
-    expect(examplesLink).toBeInTheDocument()
-    expect(nextjsLink).toBeInTheDocument()
+    expect(mockGetTodos).toHaveBeenCalledWith('active')
+  })
+
+  it('passes todos data to TodoList component', async () => {
+    const mockTodos: Todo[] = [
+      { 
+        id: 'todo-1', 
+        title: 'Test Todo 1', 
+        completed: false,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01')
+      },
+      { 
+        id: 'todo-2', 
+        title: 'Test Todo 2', 
+        completed: true,
+        createdAt: new Date('2024-01-02'),
+        updatedAt: new Date('2024-01-02')
+      }
+    ]
+    mockGetTodos.mockResolvedValue(mockTodos)
+    
+    render(await TodoPage({ searchParams: Promise.resolve({}) }))
+    
+    expect(screen.getByText('Todo List (2 items)')).toBeInTheDocument()
   })
 })
