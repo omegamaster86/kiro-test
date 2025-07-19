@@ -3,10 +3,21 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
-export async function getTodos() {
+export async function getTodos(filter?: 'all' | 'active' | 'completed') {
   try {
-    // 全タスクを作成日時の降順で取得
+    // フィルター条件を設定
+    let whereCondition = {}
+    
+    if (filter === 'active') {
+      whereCondition = { completed: false }
+    } else if (filter === 'completed') {
+      whereCondition = { completed: true }
+    }
+    // filter === 'all' または未指定の場合は条件なし（全て取得）
+    
+    // 条件に応じてタスクを取得し、作成日時の降順でソート
     const todos = await prisma.todo.findMany({
+      where: whereCondition,
       orderBy: {
         createdAt: 'desc'
       }
