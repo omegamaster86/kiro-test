@@ -33,6 +33,12 @@ jest.mock('@/components/TodoList', () => {
   }
 })
 
+jest.mock('@/components/ErrorMessage', () => {
+  return function MockErrorMessage({ message }: { message: string }) {
+    return <div data-testid="error-message">{message}</div>
+  }
+})
+
 const mockGetTodos = getTodos as jest.MockedFunction<typeof getTodos>
 
 describe('TodoPage', () => {
@@ -97,5 +103,26 @@ describe('TodoPage', () => {
     render(await TodoPage({ searchParams: Promise.resolve({}) }))
     
     expect(screen.getByText('Todo List (2 items)')).toBeInTheDocument()
+  })
+
+  it('displays error message when getTodos throws an error', async () => {
+    const errorMessage = 'データベース接続エラー'
+    mockGetTodos.mockRejectedValue(new Error(errorMessage))
+    
+    render(await TodoPage({ searchParams: Promise.resolve({}) }))
+    
+    expect(screen.getByTestId('error-message')).toBeInTheDocument()
+    expect(screen.getByText(errorMessage)).toBeInTheDocument()
+    expect(screen.getByText('Todo List (0 items)')).toBeInTheDocument()
+  })
+
+  it('displays generic error message when error is not an Error instance', async () => {
+    mockGetTodos.mockRejectedValue('Unknown error')
+    
+    render(await TodoPage({ searchParams: Promise.resolve({}) }))
+    
+    expect(screen.getByTestId('error-message')).toBeInTheDocument()
+    expect(screen.getByText('データの取得に失敗しました')).toBeInTheDocument()
+    expect(screen.getByText('Todo List (0 items)')).toBeInTheDocument()
   })
 })
