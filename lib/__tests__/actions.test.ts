@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { createTodo, toggleTodo, updateTodo, deleteTodo } from '../actions'
+import { createTodo, toggleTodo, updateTodo, deleteTodo, getTodos } from '../actions'
 import { prisma } from '../prisma'
 
 // Prismaクライアントをモック化
@@ -11,6 +11,7 @@ jest.mock('../prisma', () => ({
     todo: {
       create: jest.fn(),
       findUnique: jest.fn(),
+      findMany: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
     },
@@ -27,6 +28,81 @@ const mockPrisma = prisma as jest.Mocked<typeof prisma>
 describe('Server Actions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  describe('getTodos', () => {
+    const mockTodos = [
+      {
+        id: '1',
+        title: 'タスク1',
+        completed: false,
+        createdAt: new Date('2024-01-02'),
+        updatedAt: new Date('2024-01-02'),
+      },
+      {
+        id: '2',
+        title: 'タスク2',
+        completed: true,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      },
+    ]
+
+    it('should get all todos when no filter is provided', async () => {
+      mockPrisma.todo.findMany.mockResolvedValue(mockTodos)
+
+      const result = await getTodos()
+
+      expect(mockPrisma.todo.findMany).toHaveBeenCalledWith({
+        where: {},
+        orderBy: { createdAt: 'desc' },
+      })
+      expect(result).toEqual(mockTodos)
+    })
+
+    it('should get all todos when filter is "all"', async () => {
+      mockPrisma.todo.findMany.mockResolvedValue(mockTodos)
+
+      const result = await getTodos('all')
+
+      expect(mockPrisma.todo.findMany).toHaveBeenCalledWith({
+        where: {},
+        orderBy: { createdAt: 'desc' },
+      })
+      expect(result).toEqual(mockTodos)
+    })
+
+    it('should get only active todos when filter is "active"', async () => {
+      const activeTodos = mockTodos.filter(todo => !todo.completed)
+      mockPrisma.todo.findMany.mockResolvedValue(activeTodos)
+
+      const result = await getTodos('active')
+
+      expect(mockPrisma.todo.findMany).toHaveBeenCalledWith({
+        where: { completed: false },
+        orderBy: { createdAt: 'desc' },
+      })
+      expect(result).toEqual(activeTodos)
+    })
+
+    it('should get only completed todos when filter is "completed"', async () => {
+      const completedTodos = mockTodos.filter(todo => todo.completed)
+      mockPrisma.todo.findMany.mockResolvedValue(completedTodos)
+
+      const result = await getTodos('completed')
+
+      expect(mockPrisma.todo.findMany).toHaveBeenCalledWith({
+        where: { completed: true },
+        orderBy: { createdAt: 'desc' },
+      })
+      expect(result).toEqual(completedTodos)
+    })
+
+    it('should throw error when database operation fails', async () => {
+      mockPrisma.todo.findMany.mockRejectedValue(new Error('Database error'))
+
+      await expect(getTodos()).rejects.toThrow('タスクの取得に失敗しました')
+    })
   })
 
   describe('createTodo', () => {

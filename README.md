@@ -67,6 +67,27 @@ npm run test:watch
 npm run test:coverage
 ```
 
+## 機能
+
+このプロジェクトはTODOリストアプリケーションとして実装されており、以下の機能を提供します：
+
+### TODOアプリ機能
+- **タスク作成**: 新しいタスクの追加
+- **タスク表示**: 全タスクの一覧表示（作成日時の降順）
+- **タスク完了切り替え**: タスクの完了/未完了状態の切り替え
+- **タスク編集**: 既存タスクのタイトル編集
+- **タスク削除**: 不要なタスクの削除
+- **フィルタリング**: 全て/未完了/完了済みでのタスク絞り込み
+
+### Server Actions
+Next.js 15のServer Actionsを活用した以下のAPI：
+
+- `getTodos(filter?)` - タスク取得（フィルタリング対応）
+- `createTodo(formData)` - 新規タスク作成
+- `toggleTodo(id)` - タスク完了状態切り替え
+- `updateTodo(id, title)` - タスクタイトル更新
+- `deleteTodo(id)` - タスク削除
+
 ## プロジェクト構造
 
 ```
@@ -75,13 +96,17 @@ npm run test:coverage
 │   ├── page.tsx        # ホームページ
 │   └── globals.css     # グローバルスタイル
 ├── lib/                # ユーティリティとヘルパー
-│   └── prisma.ts       # Prismaクライアント設定
+│   ├── actions.ts      # Server Actions（TODO操作）
+│   ├── prisma.ts       # Prismaクライアント設定
+│   └── __tests__/      # テストファイル
 ├── prisma/             # データベース関連
 │   ├── schema.prisma   # データベーススキーマ
 │   ├── dev.db          # SQLiteデータベースファイル
 │   └── migrations/     # マイグレーションファイル
 ├── public/             # 静的アセット
 └── .kiro/              # Kiro設定ファイル
+    ├── specs/          # 機能仕様書
+    └── steering/       # 開発ガイドライン
 ```
 
 ## 開発ガイドライン
