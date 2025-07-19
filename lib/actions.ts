@@ -38,6 +38,11 @@ export async function createTodo(formData: FormData) {
     throw new Error('タスクのタイトルを入力してください')
   }
   
+  // タイトルの長さをチェック
+  if (title.trim().length > 200) {
+    throw new Error('タスクのタイトルは200文字以内で入力してください')
+  }
+  
   try {
     // 新しいタスクをデータベースに保存
     await prisma.todo.create({
@@ -51,7 +56,18 @@ export async function createTodo(formData: FormData) {
     revalidatePath('/')
   } catch (error) {
     console.error('タスク作成エラー:', error)
-    throw new Error('タスクの作成に失敗しました')
+    
+    // データベース固有のエラーをチェック
+    if (error instanceof Error) {
+      if (error.message.includes('UNIQUE constraint')) {
+        throw new Error('同じタイトルのタスクが既に存在します')
+      }
+      if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+        throw new Error('接続がタイムアウトしました。もう一度お試しください')
+      }
+    }
+    
+    throw new Error('タスクの作成に失敗しました。しばらく時間をおいてから再度お試しください')
   }
 }
 
@@ -63,7 +79,7 @@ export async function toggleTodo(id: string) {
     })
     
     if (!currentTodo) {
-      throw new Error('タスクが見つかりません')
+      throw new Error('指定されたタスクが見つかりません。既に削除されている可能性があります')
     }
     
     // 完了状態を切り替え
@@ -78,7 +94,22 @@ export async function toggleTodo(id: string) {
     revalidatePath('/')
   } catch (error) {
     console.error('タスク状態切り替えエラー:', error)
-    throw new Error('タスクの状態切り替えに失敗しました')
+    
+    // データベース固有のエラーをチェック
+    if (error instanceof Error) {
+      if (error.message.includes('Record to update not found')) {
+        throw new Error('タスクが見つかりません。既に削除されている可能性があります')
+      }
+      if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+        throw new Error('接続がタイムアウトしました。もう一度お試しください')
+      }
+      // 既存のエラーメッセージをそのまま使用
+      if (error.message.includes('指定されたタスク')) {
+        throw error
+      }
+    }
+    
+    throw new Error('タスクの状態切り替えに失敗しました。しばらく時間をおいてから再度お試しください')
   }
 }
 
@@ -88,6 +119,11 @@ export async function updateTodo(id: string, title: string) {
     throw new Error('タスクのタイトルを入力してください')
   }
   
+  // タイトルの長さをチェック
+  if (title.trim().length > 200) {
+    throw new Error('タスクのタイトルは200文字以内で入力してください')
+  }
+  
   try {
     // タスクの存在確認
     const existingTodo = await prisma.todo.findUnique({
@@ -95,7 +131,7 @@ export async function updateTodo(id: string, title: string) {
     })
     
     if (!existingTodo) {
-      throw new Error('タスクが見つかりません')
+      throw new Error('指定されたタスクが見つかりません。既に削除されている可能性があります')
     }
     
     // タスクのタイトルを更新
@@ -110,7 +146,22 @@ export async function updateTodo(id: string, title: string) {
     revalidatePath('/')
   } catch (error) {
     console.error('タスク更新エラー:', error)
-    throw new Error('タスクの更新に失敗しました')
+    
+    // データベース固有のエラーをチェック
+    if (error instanceof Error) {
+      if (error.message.includes('Record to update not found')) {
+        throw new Error('タスクが見つかりません。既に削除されている可能性があります')
+      }
+      if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+        throw new Error('接続がタイムアウトしました。もう一度お試しください')
+      }
+      // 既存のエラーメッセージをそのまま使用
+      if (error.message.includes('タスクのタイトル') || error.message.includes('指定されたタスク')) {
+        throw error
+      }
+    }
+    
+    throw new Error('タスクの更新に失敗しました。しばらく時間をおいてから再度お試しください')
   }
 }
 
@@ -122,7 +173,7 @@ export async function deleteTodo(id: string) {
     })
     
     if (!existingTodo) {
-      throw new Error('タスクが見つかりません')
+      throw new Error('指定されたタスクが見つかりません。既に削除されている可能性があります')
     }
     
     // タスクをデータベースから削除
@@ -134,6 +185,21 @@ export async function deleteTodo(id: string) {
     revalidatePath('/')
   } catch (error) {
     console.error('タスク削除エラー:', error)
-    throw new Error('タスクの削除に失敗しました')
+    
+    // データベース固有のエラーをチェック
+    if (error instanceof Error) {
+      if (error.message.includes('Record to delete does not exist')) {
+        throw new Error('タスクが見つかりません。既に削除されている可能性があります')
+      }
+      if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+        throw new Error('接続がタイムアウトしました。もう一度お試しください')
+      }
+      // 既存のエラーメッセージをそのまま使用
+      if (error.message.includes('指定されたタスク')) {
+        throw error
+      }
+    }
+    
+    throw new Error('タスクの削除に失敗しました。しばらく時間をおいてから再度お試しください')
   }
 }

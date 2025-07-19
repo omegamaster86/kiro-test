@@ -36,15 +36,15 @@ export default function TodoFilter() {
   }
 
   return (
-    <div className="flex gap-2 mb-6">
+    <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
       {filterOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => handleFilterChange(option.value)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 ${
             currentFilter === option.value
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
+              : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md border border-gray-200 hover:border-blue-300'
           }`}
         >
           {option.label}
