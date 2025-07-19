@@ -8,6 +8,8 @@ Next.js 15とReact 19を使用したモダンなWebアプリケーションプ�
 - **React 19.1.0** - 最新のReactとconcurrent機能
 - **TypeScript 5** - 型安全なJavaScript
 - **Tailwind CSS 4** - ユーティリティファーストCSSフレームワーク
+- **Prisma 6.12.0** - 型安全なORMとデータベースツールキット
+- **SQLite** - 軽量なファイルベースデータベース
 - **Turbopack** - 高速な開発用バンドラー
 
 ## 開発環境のセットアップ
@@ -20,6 +22,19 @@ Next.js 15とReact 19を使用したモダンなWebアプリケーションプ�
 
 ```bash
 npm install
+```
+
+### データベースのセットアップ
+
+```bash
+# Prismaクライアントの生成
+npx prisma generate
+
+# データベースマイグレーションの実行
+npx prisma migrate dev
+
+# Prisma Studioでデータベースを確認（オプション）
+npx prisma studio
 ```
 
 ### 開発サーバーの起動
@@ -59,6 +74,12 @@ npm run test:coverage
 │   ├── layout.tsx      # ルートレイアウト
 │   ├── page.tsx        # ホームページ
 │   └── globals.css     # グローバルスタイル
+├── lib/                # ユーティリティとヘルパー
+│   └── prisma.ts       # Prismaクライアント設定
+├── prisma/             # データベース関連
+│   ├── schema.prisma   # データベーススキーマ
+│   ├── dev.db          # SQLiteデータベースファイル
+│   └── migrations/     # マイグレーションファイル
 ├── public/             # 静的アセット
 └── .kiro/              # Kiro設定ファイル
 ```

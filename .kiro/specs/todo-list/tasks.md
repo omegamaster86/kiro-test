@@ -1,34 +1,34 @@
 # 実装計画
 
-- [x] 1. プロジェクトセットアップとデータベース設定
+- [ ] 1. プロジェクトセットアップとデータベース設定
   - Prismaをインストールし、SQLiteデータベースを設定する
   - Todoモデルのスキーマを定義し、マイグレーションを実行する
   - Prismaクライアントの初期化とデータベース接続を確認する
   - _要件: 1.3, 2.2_
 
-- [ ] 2. Server Actionsの実装
-  - [ ] 2.1 基本的なServer Actionsファイルを作成
+- [x] 2. Server Actionsの実装
+  - [x] 2.1 基本的なServer Actionsファイルを作成
     - lib/actions.tsファイルを作成し、Prismaクライアントをインポートする
     - 'use server'ディレクティブを追加し、基本構造を設定する
     - _要件: 1.1, 1.3_
 
-  - [ ] 2.2 createTodo Server Actionを実装
+  - [x] 2.2 createTodo Server Actionを実装
     - FormDataからタイトルを取得し、バリデーションを行う
     - 新しいタスクをデータベースに保存する機能を実装する
     - revalidatePathでページを更新する処理を追加する
     - _要件: 1.1, 1.2_
 
-  - [ ] 2.3 toggleTodo Server Actionを実装
+  - [x] 2.3 toggleTodo Server Actionを実装
     - タスクIDを受け取り、完了状態を切り替える機能を実装する
     - データベースの更新とrevalidatePathを実行する
     - _要件: 3.1, 3.2_
 
-  - [ ] 2.4 updateTodo Server Actionを実装
+  - [x] 2.4 updateTodo Server Actionを実装
     - タスクIDとタイトルを受け取り、タスクを更新する機能を実装する
     - バリデーションとデータベース更新処理を実装する
     - _要件: 5.1, 5.2, 5.4_
 
-  - [ ] 2.5 deleteTodo Server Actionを実装
+  - [x] 2.5 deleteTodo Server Actionを実装
     - タスクIDを受け取り、タスクを削除する機能を実装する
     - データベースからの削除とrevalidatePathを実行する
     - _要件: 4.2_
