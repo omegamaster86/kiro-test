@@ -36,7 +36,7 @@ describe('TodoItem', () => {
   it('未完了タスクが正しくレンダリングされる', () => {
     render(<TodoItem todo={mockTodo} />)
     
-    expect(screen.getByDisplayValue(mockTodo.title)).toBeInTheDocument()
+    expect(screen.getByText(mockTodo.title)).toBeInTheDocument()
     expect(screen.getByRole('checkbox')).not.toBeChecked()
     expect(screen.getByText('削除')).toBeInTheDocument()
     expect(screen.getByText('2024/1/1')).toBeInTheDocument()
@@ -149,11 +149,17 @@ describe('TodoItem', () => {
     render(<TodoItem todo={mockTodo} />)
     
     // 削除ボタンをクリック
-    const deleteButton = screen.getByText('削除')
-    fireEvent.click(deleteButton)
+    const deleteButtons = screen.getAllByText('削除')
+    fireEvent.click(deleteButtons[0]) // TodoItem内の削除ボタン
     
-    // 確認ダイアログで削除を確認
-    const confirmButton = screen.getByRole('button', { name: '削除' })
+    // 確認ダイアログが表示されるのを待つ
+    await waitFor(() => {
+      expect(screen.getByText('タスクの削除')).toBeInTheDocument()
+    })
+    
+    // 確認ダイアログで削除を確認（ダイアログ内の削除ボタンを取得）
+    const allDeleteButtons = screen.getAllByText('削除')
+    const confirmButton = allDeleteButtons[1] // ダイアログ内の削除ボタン
     fireEvent.click(confirmButton)
     
     await waitFor(() => {

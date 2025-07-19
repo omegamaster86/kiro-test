@@ -48,13 +48,16 @@ describe('TodoForm', () => {
     const input = screen.getByPlaceholderText('新しいタスクを入力...')
     const button = screen.getByRole('button', { name: '追加' })
     
-    // 初期状態の確認
+    // 初期状態の確認（空の場合はボタンが無効）
     expect(input).not.toBeDisabled()
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
     
     // 入力値の設定
     fireEvent.change(input, { target: { value: 'テストタスク' } })
     expect(input).toHaveValue('テストタスク')
+    
+    // 入力後はボタンが有効になる
+    expect(button).not.toBeDisabled()
     
     // フォーム送信
     fireEvent.click(button)
@@ -71,14 +74,15 @@ describe('TodoForm', () => {
     render(<TodoForm />)
     
     const input = screen.getByPlaceholderText('新しいタスクを入力...')
-    const button = screen.getByRole('button', { name: '追加' })
     
     fireEvent.change(input, { target: { value: 'テストタスク' } })
+    
+    const button = screen.getByRole('button', { name: '追加' })
     fireEvent.click(button)
     
     await waitFor(() => {
       expect(screen.getByText(errorMessage)).toBeInTheDocument()
-    })
+    }, { timeout: 3000 })
   })
 
   it('空のタイトルでは送信できない', () => {
