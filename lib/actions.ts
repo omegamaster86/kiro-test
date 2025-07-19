@@ -3,6 +3,22 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
+export async function getTodos() {
+  try {
+    // 全タスクを作成日時の降順で取得
+    const todos = await prisma.todo.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+    
+    return todos
+  } catch (error) {
+    console.error('タスク取得エラー:', error)
+    throw new Error('タスクの取得に失敗しました')
+  }
+}
+
 export async function createTodo(formData: FormData) {
   const title = formData.get('title') as string
   
